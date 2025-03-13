@@ -17,6 +17,12 @@ Enter the repo folder and install the packages:
 npm install
 ```
 
+Now you need to create a file called `.env` and put the following line in it (replace your_token with your actual bot token):
+
+```
+DISCORD_TOKEN=your_token
+```
+
 Now you can execute the bot by running `node index.js` or by opening `dnd_utils.bat`.
 
 ## Commands
