@@ -1,5 +1,6 @@
 const { Client, Collection, Events, GatewayIntentBits, ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const rollStats = require('./commands/rollstats');
+const rollHP = require('./commands/rollhp');
 const dotenv = require('dotenv');
 dotenv.config();
 // setup math random seed with actual datetime
@@ -19,7 +20,10 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.on(Events.MessageCreate, message => {
-	if (message.content === 'rollstats') {
+	const args = message.content.trim().split(' ');
+	const command = args.shift().toLowerCase();
+	
+	if (command === 'rollstats') {
 		const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
@@ -27,8 +31,41 @@ client.on(Events.MessageCreate, message => {
                     .setLabel('Volver a Intentar')
                     .setStyle('Primary')
             );
-
         message.reply({ content: rollStats(), components: [row] });
+	} 
+	else if (command === 'rollhp') {
+		// get the hit dice from the message
+		let dice = 0;
+		let levelCount = 1;
+		let constitution = 0;
+
+		if (args.length > 0) {
+			// check if it starts with 'd'
+			if (args[0].startsWith('d')) {
+				// get the number after the 'd'
+				dice = parseInt(args[0].substring(1));
+			} else {
+				dice = parseInt(args[0]);
+			}
+		} else {
+			message.reply(
+				'Por favor ingresa un comando valido: `rollhp dX Y Z` o `rollhp X Y Z`, ' +
+				'donde X es el numero de dados, Y es el nivel y Z es tu constitución. 🤦'
+			);
+			return;
+		}
+
+		// get the levels from the message
+		if (args.length > 1) {
+			levelCount = parseInt(args[1]);
+		}
+
+		// get the constitution from the message
+		if (args.length > 2) {
+			constitution = parseInt(args[2]);
+		}
+		
+		message.reply(rollHP(dice, levelCount, constitution));
 	}
 });
 
